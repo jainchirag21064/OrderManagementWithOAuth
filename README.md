@@ -29,7 +29,7 @@ https://oidcdebugger.com/
 ```
 
 #### OrderManagementOauth2PostmanTestScripts
-This is the postman colles=ction of test scripts for the CRUD opertion of Order Management 
+This is the postman collection of test scripts for the CRUD opertion of Order Management 
 - Import the collection in Postman Tool
 - You can also run the collection using below newman command 
 ```
