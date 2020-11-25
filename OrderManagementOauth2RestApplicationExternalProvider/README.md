@@ -54,7 +54,7 @@ docker container run --name ordermanagement -p 9090:9090 savingtargets:0.0.1-SNA
 ```
 
 ##Swagger Rest Specification :
- [Order Management API](https://github.com/jainchirag21064/OrderManagementWithOAuth/blob/master/OrderManagementAPI.yml)
+- [Order Management API](https://github.com/jainchirag21064/OrderManagementWithOAuth/blob/master/OrderManagementAPI.yml)
 
 ##Note : 
 This application by default uses port 9090 if that port is not free you might see a “Port already in use” error.
