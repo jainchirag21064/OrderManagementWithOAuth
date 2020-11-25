@@ -1,0 +1,877 @@
+{
+	"info": {
+		"_postman_id": "78c0b8d1-8371-4f0b-9a24-1bfb2354c7ea",
+		"name": "OrderManagement",
+		"description": "Order Management Rest API Testing Scripts",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Test Case for User with Admin Role",
+			"item": [
+				{
+					"name": "GetAccessToken1",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b52c938f-8eae-4b6e-8047-0d5a92bb4ef0",
+								"exec": [
+									"pm.environment.set(\"LOGIN_WITH\", \"admin\");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "8454f95c-86f1-4562-85e0-24d1dec3c971",
+								"exec": [
+									"pm.test(\"Status code is 200 when logged in using \"+pm.environment.get(\"LOGIN_WITH\"), function () {",
+									"    pm.response.to.have.status(200);",
+									"    var data = JSON.parse(responseBody);",
+									"    pm.environment.set(\"ACCESS_TOKEN\",\"Bearer \"+data.access_token);",
+									"    postman.setNextRequest(\"GetAllOrders1\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{LOGIN_WITH}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{LOGIN_WITH}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{OAuthENV}}/oauth/token?grant_type={{GRANTTYPE}}",
+							"host": [
+								"{{OAuthENV}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							],
+							"query": [
+								{
+									"key": "grant_type",
+									"value": "{{GRANTTYPE}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllOrders1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8cf6e241-ad3a-44ed-bff0-5fd2d5cc6a3b",
+								"exec": [
+									"pm.test(\"Status code is 200 when admin user fetch all the order detials \", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"postman.setNextRequest(\"GetSpecificOrders1\");",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{ACCESS_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{ENV}}/api/v1/orders/",
+							"host": [
+								"{{ENV}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"orders",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetSpecificOrders1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "473f1de1-fa71-4c86-b3d3-c8e35021bc4d",
+								"exec": [
+									"",
+									"var count = parseInt(postman.getEnvironmentVariable(\"TESTCASE_COUNT\"));",
+									"switch (count) {",
+									"        case 1:",
+									"           pm.test(\"Status code is 200 when admin user fetch a specific order detials \", function () {",
+									"            pm.response.to.have.status(200);",
+									"            });",
+									"            postman.setEnvironmentVariable(\"TESTCASE_COUNT\", count+1);",
+									"            postman.setNextRequest(\"GetSpecificOrders1\");",
+									"        break;",
+									"        case 2:",
+									"           pm.test(\"Status code is 200 when admin user fetch a specific order detials \", function () {",
+									"            pm.response.to.have.status(200);",
+									"            });",
+									"            postman.setEnvironmentVariable(\"TESTCASE_COUNT\", count+1);",
+									"            postman.setNextRequest(\"GetSpecificOrders1\");",
+									"        break;",
+									"        case 3:",
+									"           pm.test(\"Status code is 400 when admin user fetch a specific order detials which does not exist \", function () {",
+									"            pm.response.to.have.status(400);",
+									"            });",
+									"",
+									"        pm.test(\"Order Not Found.\", function () {",
+									"            pm.expect(pm.response.text()).to.include(\"Order Not Found.\");",
+									"        });",
+									"            postman.setEnvironmentVariable(\"TESTCASE_COUNT\", 1);",
+									"            postman.setNextRequest(\"AddOrder1\");",
+									"        break;",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8027a48d-6ef5-4f8a-9d58-622640c6d91d",
+								"exec": [
+									"",
+									"var count = parseInt(pm.environment.get(\"TESTCASE_COUNT\"));",
+									"switch (count) {",
+									"    case 1:",
+									"        pm.environment.set(\"ORDERID\", \"1\");",
+									"        break;",
+									"    case 2:",
+									"        pm.environment.set(\"ORDERID\", \"2\");",
+									"        break;",
+									"    case 3:",
+									"        pm.environment.set(\"ORDERID\", \"99\");",
+									"        break;                                                                                                                                               ",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{ENV}}/api/v1/orders/{{ORDERID}}",
+							"host": [
+								"{{ENV}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"orders",
+								"{{ORDERID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddOrder1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8fbf4908-2fb6-460d-b7a3-e6687a66c60b",
+								"exec": [
+									"pm.test(\"Status code is 403 Unauthorized when admin user tries to add an order details.\", function () {",
+									"    pm.response.to.have.status(403);",
+									"    postman.setNextRequest(\"UpdateOrderStatus1\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{ACCESS_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"referenceNumber\": \"OrderIDReference11\",\n    \"totalPrice\": 825.45,\n    \"status\": \"PLACED\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ENV}}/api/v1/orders",
+							"host": [
+								"{{ENV}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateOrderStatus1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "40cd0047-2883-4516-9d48-f97a1c2ed772",
+								"exec": [
+									"",
+									"var count = parseInt(postman.getEnvironmentVariable(\"TESTCASE_COUNT\"));",
+									"switch (count) {",
+									"        case 1:",
+									"           pm.test(\"Status code is 200 when admin user update the status specific order detials \", function () {",
+									"            pm.response.to.have.status(200);",
+									"            });",
+									"            postman.setEnvironmentVariable(\"TESTCASE_COUNT\", count+1);",
+									"            postman.setNextRequest(\"UpdateOrderStatus1\");",
+									"        break;",
+									"        case 2:",
+									"           pm.test(\"Status code is 200 when admin user fetch a specific order detials \", function () {",
+									"            pm.response.to.have.status(200);",
+									"            });",
+									"            postman.setEnvironmentVariable(\"TESTCASE_COUNT\", count+1);",
+									"            postman.setNextRequest(\"UpdateOrderStatus1\");",
+									"        break;",
+									"        case 3:",
+									"           pm.test(\"Status code is 200 when admin user fetch a specific order detials \", function () {",
+									"            pm.response.to.have.status(200);",
+									"            });",
+									"            postman.setEnvironmentVariable(\"TESTCASE_COUNT\", count+1);",
+									"            postman.setNextRequest(\"UpdateOrderStatus1\");",
+									"        break;",
+									"        case 4:",
+									"           pm.test(\"Status code is 200 when admin user fetch a specific order detials \", function () {",
+									"            pm.response.to.have.status(200);",
+									"            });",
+									"            postman.setEnvironmentVariable(\"TESTCASE_COUNT\", count+1);",
+									"            postman.setNextRequest(\"UpdateOrderStatus1\");",
+									"        break;  ",
+									"        case 5:",
+									"           pm.test(\"Status code is 200 when admin user fetch a specific order detials \", function () {",
+									"            pm.response.to.have.status(200);",
+									"            });",
+									"            postman.setEnvironmentVariable(\"TESTCASE_COUNT\", count+1);",
+									"            postman.setNextRequest(\"UpdateOrderStatus1\");",
+									"        break;",
+									"        case 6:",
+									"           pm.test(\"Status code is 200 when admin user fetch a specific order detials \", function () {",
+									"            pm.response.to.have.status(200);",
+									"            });",
+									"            postman.setEnvironmentVariable(\"TESTCASE_COUNT\", 1);",
+									"            postman.setNextRequest(\"CancelOrder1\");",
+									"        break;                          ",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "51daee6d-209d-4363-a952-28d8a9422d01",
+								"exec": [
+									"",
+									"var count = parseInt(pm.environment.get(\"TESTCASE_COUNT\"));",
+									"switch (count) {",
+									"    case 1:",
+									"        pm.environment.set(\"ORDERID\", \"1\");",
+									"        pm.environment.set(\"STATUS\", \"PLACED\");",
+									"        break; ",
+									"    case 2:",
+									"        pm.environment.set(\"ORDERID\", \"1\");",
+									"        pm.environment.set(\"STATUS\", \"DELAYED\");",
+									"        break; ",
+									"    case 3:",
+									"        pm.environment.set(\"ORDERID\", \"1\");",
+									"        pm.environment.set(\"STATUS\", \"CANCELLED\");",
+									"        break;         ",
+									"    case 4:",
+									"        pm.environment.set(\"ORDERID\", \"1\");",
+									"        pm.environment.set(\"STATUS\", \"IN_TRANSIT\");",
+									"        break;",
+									"    case 5:",
+									"        pm.environment.set(\"ORDERID\", \"1\");",
+									"        pm.environment.set(\"STATUS\", \"DELIVERED\");",
+									"        break; ",
+									"    case 6:",
+									"        pm.environment.set(\"ORDERID\", \"1\");",
+									"        pm.environment.set(\"STATUS\", \"REQUEST_RETURN\");",
+									"        break;                           ",
+									"                                                          ",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{ACCESS_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ENV}}/api/v1/orders/{{ORDERID}}/status/{{STATUS}}",
+							"host": [
+								"{{ENV}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"orders",
+								"{{ORDERID}}",
+								"status",
+								"{{STATUS}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CancelOrder1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b122d2a7-04d4-4dd4-a409-67290740cfad",
+								"exec": [
+									"pm.test(\"Status code is 403 when admin user cancel the order detials \", function () {",
+									"pm.response.to.have.status(403);",
+									"});",
+									"postman.setNextRequest(\"GetAccessToken2\");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "36c2254a-a162-4462-986f-d192feedc094",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{ACCESS_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ENV}}/api/v1/orders/{{ORDERID}}",
+							"host": [
+								"{{ENV}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"orders",
+								"{{ORDERID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Test Case for User with Admin Role",
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Test Case for User with User Role",
+			"item": [
+				{
+					"name": "GetAccessToken2",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "2e83e189-f2e7-492e-93bd-1477588522f6",
+								"exec": [
+									"pm.environment.set(\"LOGIN_WITH\", \"user\");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "3d4ce6d5-9a5c-421a-81d4-42f37f1e23e9",
+								"exec": [
+									"pm.test(\"Status code is 200 when logged in using \"+pm.environment.get(\"LOGIN_WITH\"), function () {",
+									"    pm.response.to.have.status(200);",
+									"    var data = JSON.parse(responseBody);",
+									"    pm.environment.set(\"ACCESS_TOKEN\",\"Bearer \"+data.access_token);",
+									"    postman.setNextRequest(\"GetAllOrders2\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{LOGIN_WITH}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{LOGIN_WITH}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{OAuthENV}}/oauth/token?grant_type={{GRANTTYPE}}",
+							"host": [
+								"{{OAuthENV}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							],
+							"query": [
+								{
+									"key": "grant_type",
+									"value": "{{GRANTTYPE}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllOrders2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0396b53f-eeca-41ae-be0a-dfa093f40b64",
+								"exec": [
+									"pm.test(\"Status code is 403 when normal user fetch all the order detials \", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"postman.setNextRequest(\"GetSpecificOrders2\");",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{ACCESS_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{ENV}}/api/v1/orders/",
+							"host": [
+								"{{ENV}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"orders",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetSpecificOrders2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "28d0bd1e-64d2-4f1f-ae66-69338ab3d721",
+								"exec": [
+									"",
+									"var count = parseInt(postman.getEnvironmentVariable(\"TESTCASE_COUNT\"));",
+									"switch (count) {",
+									"        case 1:",
+									"           pm.test(\"Status code is 200 when admin user fetch a specific order detials \", function () {",
+									"            pm.response.to.have.status(200);",
+									"            });",
+									"            postman.setEnvironmentVariable(\"TESTCASE_COUNT\", count+1);",
+									"            postman.setNextRequest(\"GetSpecificOrders2\");",
+									"        break;",
+									"        case 2:",
+									"           pm.test(\"Status code is 200 when admin user fetch a specific order detials \", function () {",
+									"            pm.response.to.have.status(200);",
+									"            });",
+									"            postman.setEnvironmentVariable(\"TESTCASE_COUNT\", count+1);",
+									"            postman.setNextRequest(\"GetSpecificOrders2\");",
+									"        break;",
+									"        case 3:",
+									"           pm.test(\"Status code is 400 when admin user fetch a specific order detials which does not exist \", function () {",
+									"            pm.response.to.have.status(400);",
+									"            });",
+									"",
+									"        pm.test(\"Order Not Found.\", function () {",
+									"            pm.expect(pm.response.text()).to.include(\"Order Not Found.\");",
+									"        });",
+									"            postman.setEnvironmentVariable(\"TESTCASE_COUNT\", 1);",
+									"            postman.setNextRequest(\"AddOrder2\");",
+									"        break;",
+									"",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "bffa186e-6011-4d85-85c5-d340b6b9e903",
+								"exec": [
+									"",
+									"var count = parseInt(pm.environment.get(\"TESTCASE_COUNT\"));",
+									"switch (count) {",
+									"    case 1:",
+									"        pm.environment.set(\"ORDERID\", \"1\");",
+									"        break;",
+									"    case 2:",
+									"        pm.environment.set(\"ORDERID\", \"2\");",
+									"        break;",
+									"    case 3:",
+									"        pm.environment.set(\"ORDERID\", \"99\");",
+									"        break;                                                                                                                                               ",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{ENV}}/api/v1/orders/{{ORDERID}}",
+							"host": [
+								"{{ENV}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"orders",
+								"{{ORDERID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddOrder2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d639418f-6e9a-4030-a120-64c6ec9caba6",
+								"exec": [
+									"pm.test(\"Status code is 201 when normal user tries to add an order details.\", function () {",
+									"    pm.response.to.have.status(201);",
+									"    postman.setNextRequest(\"UpdateOrderStatus2\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{ACCESS_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"referenceNumber\": \"OrderIDReference11\",\n    \"totalPrice\": 825.45,\n    \"status\": \"PLACED\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ENV}}/api/v1/orders",
+							"host": [
+								"{{ENV}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateOrderStatus2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ccb42a6a-4fe1-4386-90cf-625ddf61880a",
+								"exec": [
+									"pm.test(\"Status code is 403 when norma user update the status specific order detials \", function () {",
+									"pm.response.to.have.status(403);",
+									"});",
+									"postman.setEnvironmentVariable(\"TESTCASE_COUNT\", 1);",
+									"postman.setNextRequest(\"CancelOrder2\");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "72cbfc51-2425-4517-9549-2c10730b3154",
+								"exec": [
+									"",
+									"var count = parseInt(pm.environment.get(\"TESTCASE_COUNT\"));",
+									"switch (count) {",
+									"    case 1:",
+									"        pm.environment.set(\"ORDERID\", \"1\");",
+									"        pm.environment.set(\"STATUS\", \"PLACED\");",
+									"        break; ",
+									"    case 2:",
+									"        pm.environment.set(\"ORDERID\", \"1\");",
+									"        pm.environment.set(\"STATUS\", \"DELAYED\");",
+									"        break; ",
+									"    case 3:",
+									"        pm.environment.set(\"ORDERID\", \"1\");",
+									"        pm.environment.set(\"STATUS\", \"CANCELLED\");",
+									"        break;         ",
+									"    case 4:",
+									"        pm.environment.set(\"ORDERID\", \"1\");",
+									"        pm.environment.set(\"STATUS\", \"IN_TRANSIT\");",
+									"        break;",
+									"    case 5:",
+									"        pm.environment.set(\"ORDERID\", \"1\");",
+									"        pm.environment.set(\"STATUS\", \"DELIVERED\");",
+									"        break; ",
+									"    case 6:",
+									"        pm.environment.set(\"ORDERID\", \"1\");",
+									"        pm.environment.set(\"STATUS\", \"REQUEST_RETURN\");",
+									"        break;                           ",
+									"                                                          ",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{ACCESS_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ENV}}/api/v1/orders/{{ORDERID}}/status/{{STATUS}}",
+							"host": [
+								"{{ENV}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"orders",
+								"{{ORDERID}}",
+								"status",
+								"{{STATUS}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CancelOrder2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d23306d0-6fa6-4924-bc03-e030d2d71220",
+								"exec": [
+									"pm.test(\"Status code is 400 when user cancel the order detials \", function () {",
+									"pm.response.to.have.status(400);",
+									"});",
+									"postman.setNextRequest(null);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "d6ebb94b-1173-4ee7-a7f4-af422cb55fb9",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{ACCESS_TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ENV}}/api/v1/orders/{{ORDERID}}",
+							"host": [
+								"{{ENV}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"orders",
+								"{{ORDERID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Test Case for User with Admin Role",
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
